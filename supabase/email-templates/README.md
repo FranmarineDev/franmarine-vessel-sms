@@ -5,7 +5,7 @@ Paste each into **Supabase → Authentication → Emails → Templates** (select
 | Supabase template | File | Subject to set |
 |---|---|---|
 | Confirm sign up | confirm-signup.html | Confirm your Franmarine Vessel SMS account |
-| Invite user | invite.html | You've been added to the Franmarine Vessel SMS |
+| Invite user | invite.html | Vessel SMS is going digital — welcome aboard |
 | Reset password | reset-password.html | Reset your Vessel SMS password |
 | Magic link | magic-link.html | Your Vessel SMS sign-in link |
 
