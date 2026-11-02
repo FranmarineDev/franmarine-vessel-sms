@@ -375,9 +375,10 @@ create policy "predep: read region" on public.pre_departures
 
 -- ---------- Alerts digest: who receives it ----------
 -- Managers/admins with an email receive the daily digest (edge function `alerts-digest`, see README).
-create or replace view public.alert_recipients as
+create or replace view public.alert_recipients with (security_invoker = true) as
   select id, full_name, email, region, role from public.profiles
   where status = 'approved' and role in ('manager','admin') and email is not null;
+revoke all on public.alert_recipients from anon, authenticated;  -- service role (digest function) only
 
 -- ---------- Emergency drill records (FUS-SMS-xx-04B) ----------
 create table if not exists public.drills (
