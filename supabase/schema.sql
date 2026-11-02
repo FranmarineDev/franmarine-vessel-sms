@@ -414,3 +414,11 @@ create policy "drills: read region" on public.drills
   for select to authenticated using (
     public.my_role() = 'admin'
     or exists (select 1 from public.vessels v where v.id = vessel_id and v.region = public.my_region()));
+
+-- ---------- Hardening (advisor) ----------
+revoke execute on function public.handle_new_user() from anon, authenticated, public;
+revoke execute on function public.protect_profile_self_edit() from anon, authenticated, public;
+revoke execute on function public.my_region() from anon, public;
+revoke execute on function public.my_role() from anon, public;
+revoke execute on function public.my_status() from anon, public;
+alter function public.protect_profile_self_edit() set search_path = public;
