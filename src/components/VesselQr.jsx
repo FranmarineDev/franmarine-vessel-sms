@@ -4,8 +4,9 @@ import QRCode from "qrcode";
 /** Absolute URL for a route in this deployment (works with BrowserRouter and HashRouter). */
 export function appUrl(route) {
   const { origin, pathname, hash } = window.location;
-  const base = origin + pathname.replace(/index\.html$/, "");
-  return hash || import.meta.env.VITE_HASH_ROUTER === "1" ? `${base}#${route}` : `${origin}${route}`;
+  if (hash || import.meta.env.VITE_HASH_ROUTER === "1") return `${origin}${pathname.replace(/index\.html$/, "")}#${route}`;
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+  return `${origin}${base}${route}`;
 }
 
 export default function VesselQr({ vessel }) {

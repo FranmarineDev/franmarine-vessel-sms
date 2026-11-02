@@ -35,7 +35,7 @@ function PublicOnly({ children }) {
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename={import.meta.env.VITE_HASH_ROUTER === "1" ? undefined : import.meta.env.BASE_URL.replace(/\/$/, "")}>
         <Routes>
           <Route path="/login" element={<PublicOnly><Login /></PublicOnly>} />
           <Route path="/signup" element={<PublicOnly><SignUp /></PublicOnly>} />
