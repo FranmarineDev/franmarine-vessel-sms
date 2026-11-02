@@ -321,7 +321,7 @@ begin
   select * into inv from public.invitations where lower(email) = lower(new.email) and accepted_at is null;
   if found then
     insert into public.profiles (id, full_name, region, role, status, email)
-    values (new.id, coalesce(nullif(new.raw_user_meta_data->>'full_name',''), inv.full_name), inv.region, inv.role, 'approved', lower(new.email))
+    values (new.id, coalesce(nullif(new.raw_user_meta_data->>'full_name',''), inv.full_name), inv.region, inv.role, 'approved'::account_status, lower(new.email))
     on conflict (id) do nothing;
     update public.invitations set accepted_at = now() where id = inv.id;
   else
@@ -330,8 +330,8 @@ begin
       new.id,
       coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
       coalesce((new.raw_user_meta_data->>'region')::region_code, 'NSW'),
-      'crew',
-      case when lower(new.email) like '%@franmarine.com.au' then 'approved' else 'pending' end,
+      'crew'::user_role,
+      (case when lower(new.email) like '%@franmarine.com.au' then 'approved' else 'pending' end)::account_status,
       lower(new.email)
     )
     on conflict (id) do nothing;
@@ -417,6 +417,7 @@ create policy "drills: read region" on public.drills
 
 -- ---------- Hardening (advisor) ----------
 revoke execute on function public.handle_new_user() from anon, authenticated, public;
+grant execute on function public.handle_new_user() to supabase_auth_admin;  -- the auth service fires the trigger
 revoke execute on function public.protect_profile_self_edit() from anon, authenticated, public;
 revoke execute on function public.my_region() from anon, public;
 revoke execute on function public.my_role() from anon, public;
