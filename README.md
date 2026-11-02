@@ -2,8 +2,11 @@
 
 Branded web app for Franmarine Underwater Services vessel Safety Management Systems.
 Stage 1: login → region-aware vessel dashboard (NSW / WA).
-Stage 2: per-user **vessel induction** and **daily sign-on** gate before the SMS opens; the real
-SMS document packs (Integrity III, Rohani, Seagull) are served from `public/sms/`.
+Stage 2: per-user **vessel induction** and **daily sign-on** gate before the SMS opens; the SMS
+document packs (Integrity III, Rohani, Seagull) live in the private Supabase Storage bucket `sms-docs`
+(path `<vessel-slug>/<section>/<file>.pdf`) and open via 5-minute signed URLs — RLS restricts them to
+approved users in the vessel's region. `src/data/smsManifest.json` is the index (titles, codes, sizes).
+To add or replace a pack: upload the PDFs to the bucket under the vessel's slug and regenerate the manifest.
 
 Stack: Vite + React, React Router, Supabase (Auth + Postgres with row-level security).
 

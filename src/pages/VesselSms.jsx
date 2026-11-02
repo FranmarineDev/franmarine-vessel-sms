@@ -7,6 +7,7 @@ import TodayCrew from "../components/TodayCrew";
 import VesselQr from "../components/VesselQr";
 import DrillsPanel from "../components/DrillsPanel";
 import { useAuth } from "../lib/auth";
+import { openSmsDocument } from "../lib/vessels";
 
 function fmtDate(d) {
   if (!d) return "—";
@@ -22,6 +23,7 @@ export default function VesselSms({ vessel, status }) {
   const [open, setOpen] = useState(null);
   const [preDep, setPreDep] = useState(undefined);
   const [doingPreDep, setDoingPreDep] = useState(false);
+  const [docError, setDocError] = useState("");
   const isMaster = status.signOn.role_today === "Master";
   useEffect(() => {
     getTodayPreDeparture(vessel.id).then(setPreDep).catch(() => setPreDep(null));
@@ -92,6 +94,7 @@ export default function VesselSms({ vessel, status }) {
 
       <section className="panel">
         <div className="panel-head">SMS documents · {vessel.doc_prefix}</div>
+        {docError && <div className="error" style={{ margin: 10 }}>{docError}</div>}
         <ul className="sms-sections">
           {sections.map((s) => {
             const isOpen = open === s.num;
@@ -107,11 +110,11 @@ export default function VesselSms({ vessel, status }) {
                   <ul className="sms-docs">
                     {s.docs.map((d) => (
                       <li key={d.file}>
-                        <a href={import.meta.env.BASE_URL + d.file} target="_blank" rel="noopener">
+                        <button type="button" className="doc-link" onClick={() => { setDocError(""); openSmsDocument(d.file).catch((e) => setDocError(e.message)); }}>
                           <span className="code">{d.code ? `${vessel.doc_prefix}-${d.code}` : "Certificate"}</span>
                           {d.title}
                           <span className="size">{fmtSize(d.size)}</span>
-                        </a>
+                        </button>
                       </li>
                     ))}
                   </ul>
