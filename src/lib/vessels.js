@@ -23,10 +23,13 @@ export async function getVessel(idOrSlug) {
   if (DEMO_MODE) {
     return vesselBySlug(idOrSlug);
   }
+  // The id column is a uuid, so comparing a slug against it is a Postgres error (400).
+  // Pick the right column based on the shape of the value.
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
   const { data, error } = await supabase
     .from("vessels")
     .select("*")
-    .or(`id.eq.${idOrSlug},slug.eq.${idOrSlug}`)
+    .eq(isUuid ? "id" : "slug", idOrSlug)
     .maybeSingle();
   if (error) throw error;
   return data ? mergeContent(data) : null;

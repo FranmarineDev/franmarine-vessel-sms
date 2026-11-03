@@ -32,13 +32,27 @@ export default function VesselGate() {
         setVessel(v);
         if (v) refresh(v);
       })
-      .catch(() => setVessel(null));
+      .catch((e) => {
+        setVessel(null);
+        setError(e.message || "Could not load this vessel.");
+      });
   }, [id, refresh]);
 
   if (vessel === undefined || (vessel && !status && !error)) {
     return (
       <AppShell>
         <div className="loading">Checking your access…</div>
+      </AppShell>
+    );
+  }
+  // A lookup failure shows the error rather than silently bouncing to the dashboard.
+  if (!vessel && error) {
+    return (
+      <AppShell>
+        <div className="crumb">
+          <Link to="/">← Vessels</Link>
+        </div>
+        <div className="error">{error}</div>
       </AppShell>
     );
   }
